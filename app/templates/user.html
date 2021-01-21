@@ -1,16 +1,31 @@
-{% extends base.html %}
+{% extends "base.html" %}
 
 {% block content %}
 
-<h1> Profile</h1>
-<table>
+<h1> User Account</h1>
+
+<hr>
+
+<h2><img src="{{ user.avatar(128) }}"> Welcome {{ user.username }}!</h2>
+<h5> Last seen: {{ user.last_seen }}</h5>
+{% if user == current_user %}
+    <a href="{{ url_for('edit_profile', username=current_user.username)}}">Edit Your Profile</a>
+{% endif %}
+<table class="table">
     <thead>
-        <tr>User: {{ user.username }}</tr>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">{{ user.username }}</th>
+        </tr>
     </thead>
     <tbody>
         {% for post in posts %}
-            <tr>{{ post }}</tr>
+            <tr>
+              <th scope="row">{{loop.index}}</th>
+              <td>{{ post.body }}</td>
+            </tr>
         {% endfor %}
     </tbody>
 </table>
+
 {% endblock %}

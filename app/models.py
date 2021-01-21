@@ -15,6 +15,8 @@ class User(UserMixin, db.Model):
     posts = db.relation('Post', backref='author', lazy='dynamic')  # Define relation between User and Post class
                                                                    # backref adds attribute author to the posts
                                                                    # lazy='dynamic' makes the "posts" a query rather than a list
+    about_me = db.Column(db.String(140))
+    last_seen = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
@@ -26,16 +28,10 @@ class User(UserMixin, db.Model):
         return check_password_hash(self.password_hash, password)
 
     def avatar(self, size):
-        digest = md5(self.email.lower().encoded('utf-8')).hexdigest()
-        return 'https://www.gravatar/com/avatar/{}?d=identicon&s={}'.format(
+        digest = md5(self.email.lower().encode('utf-8')).hexdigest()
+        return 'https://www.gravatar.com/avatar/{}?d=identicon&s={}'.format(
             digest, size
         )
-
-
-# For login session this function gets the user-id and returns the User object for the flask-login module
-@login.user_loader
-def load_user(id):
-    return User.query.get(int(id))
 
 
 # ------------------------------------------ Post Model ----------------------------------------------------------------
@@ -47,3 +43,9 @@ class Post(db.Model):
 
     def __repr__(self):
         return '<Post {}>'.format(self.body)
+
+
+# For login session this function gets the user-id and returns the User object for the flask-login module
+@login.user_loader
+def load_user(id):
+    return User.query.get(int(id))

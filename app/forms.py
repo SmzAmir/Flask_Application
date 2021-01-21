@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired, length, ValidationError, EqualTo, Email
 from app.models import User
 
@@ -33,7 +33,10 @@ class RegistrationForm(FlaskForm):
 
     email = StringField(label='Email',
                         render_kw={'class': 'form-control', 'id': 'form-email'},
-                        validators=[DataRequired(), Email()])
+                        validators=[DataRequired(),
+                                    length(max=120, message='Too long email'),
+                                    Email()]
+                        )
 
     password = PasswordField(label='Password',
                              render_kw={'class': 'form-control', 'id': 'form-password'},
@@ -58,3 +61,27 @@ class RegistrationForm(FlaskForm):
         email = User.query.filter_by(email=email.data).first()
         if email is not None:  # email already exists
             raise ValidationError(message='Please try a different email.')
+
+
+# ------------------------------------------ Edit Profile Form ---------------------------------------------------------
+class EditProfileForm(FlaskForm):
+    username = StringField(label='Username',
+                           render_kw={'class': 'form-control', 'id': 'form-username'},
+                           validators=[DataRequired(),
+                                       length(min=3, message='Username must be at least 3 characters'),
+                                       length(max=64, message='Too long username')]
+                           )
+
+    email = StringField(label='Email',
+                        render_kw={'class': 'form-control', 'id': 'form-email'},
+                        validators=[Email(),
+                                    length(max=120, message='Too long email')
+                                    ])
+
+    about_me = TextAreaField(label='About Me',
+                             render_kw={'class': 'form-control', 'id': 'form-about-me'},
+                             validators=[length(min=0, max=140)])
+
+    submit = SubmitField(label='Submit',
+                         render_kw={'class': 'btn btn-primary', 'id': 'register-button'},
+                         )
