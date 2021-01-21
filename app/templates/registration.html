@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 
 {% block content%}
-<h1>Sign In</h1>
+<h1>Register</h1>
 <div class="mb-3">
-    <form action="" method="post">
+    <form action="" method="post" class="form">
         {{ form.hidden_tag() }}
 
         <!-- Username Field ------------------------------------------------------------------------------------------->
@@ -11,6 +11,15 @@
             {{ form.username }}
             <label>{{ form.username.label }}</label>
             {% for error in form.username.erros %}
+                <span class="help-block">{{ error }}</span>
+            {% endfor %}
+        </div>
+
+        <!-- Email Field ---------------------------------------------------------------------------------------------->
+        <div class="form-floating mb-3">
+            {{ form.email }}
+            <label>{{ form.email.label }}</label>
+            {% for error in form.email.erros %}
                 <span class="help-block">{{ error }}</span>
             {% endfor %}
         </div>
@@ -24,18 +33,17 @@
             {% endfor %}
         </div>
 
-        <!-- Remember Me --------------------------------------------------------------------------------------------->
-        {{ form.remember_me() }}
-        <label>{{ form.remember_me.label }}</label>
-
-        <br>
+        <!-- Password2 Field ------------------------------------------------------------------------------------------>
+        <div class="form-floating mb-3">
+            {{ form.password2 }}
+            <label>{{ form.password2.label }}</label>
+            {% for error in form.password2.erros %}
+                <span class="help-block">{{ error }}</span>
+            {% endfor %}
+        </div>
 
         <!-- Submit Field --------------------------------------------------------------------------------------------->
         {{ form.submit }}
-
-        <br>
-        <br>
-        <p>New User?<a href="{{ url_for('registration') }}"> Click here to register!</a></p>
     </form>
 </div>
 {% endblock %}

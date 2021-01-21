@@ -1,11 +1,60 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, length, ValidationError, EqualTo, Email
+from app.models import User
 
 
 # ------------------------------------------ Login Form ----------------------------------------------------------------
 class LoginForm(FlaskForm):
-    username = StringField(label='Username', validators=[DataRequired()])
-    password = PasswordField(label='Password', validators=[DataRequired()])
-    remember_me = BooleanField(label='Remember Me')
-    submit = SubmitField(label='Sign In')
+    username = StringField(label='Username',
+                           render_kw={'class': 'form-control', 'id': 'form-username'},
+                           validators=[DataRequired()])
+
+    password = PasswordField(label='Password',
+                             render_kw={'class': 'form-control', 'id': 'form-password'},
+                             validators=[DataRequired()])
+
+    remember_me = BooleanField(label='Remember Me',
+                               render_kw={'class': 'form-check-label'})
+
+    submit = SubmitField(label='Sign In',
+                         render_kw={'class': 'btn btn-primary', 'id': 'register-button'},
+                         )
+
+
+# ------------------------------------------ Registration Form ---------------------------------------------------------
+class RegistrationForm(FlaskForm):
+    username = StringField(label='Username',
+                           render_kw={'class': 'form-control', 'id': 'form-username'},
+                           validators=[DataRequired(),
+                                       length(min=3, message='Username must be at least 3 characters'),
+                                       length(max=64, message='Too long username')]
+                           )
+
+    email = StringField(label='Email',
+                        render_kw={'class': 'form-control', 'id': 'form-email'},
+                        validators=[DataRequired(), Email()])
+
+    password = PasswordField(label='Password',
+                             render_kw={'class': 'form-control', 'id': 'form-password'},
+                             validators=[DataRequired()]
+                             )
+
+    password2 = PasswordField(label='Repeat Password',
+                              render_kw={'class': 'form-control', 'id': 'form-password2'},
+                              validators=[DataRequired(), EqualTo('password')
+                                          ]
+                              )
+    submit = SubmitField(label='Register',
+                         render_kw={'class': 'btn btn-primary', 'id': 'register-button'},
+                         )
+
+    def validate_username(self, username):
+        user = User.query.filter_by(username=username.data).first()
+        if user is not None:  # username already exists
+            raise ValidationError(message='Please try a different username.')
+
+    def validate_email(self, email):
+        email = User.query.filter_by(email=email.data).first()
+        if email is not None:  # email already exists
+            raise ValidationError(message='Please try a different email.')

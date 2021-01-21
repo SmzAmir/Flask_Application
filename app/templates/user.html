@@ -1,0 +1,16 @@
+{% extends base.html %}
+
+{% block content %}
+
+<h1> Profile</h1>
+<table>
+    <thead>
+        <tr>User: {{ user.username }}</tr>
+    </thead>
+    <tbody>
+        {% for post in posts %}
+            <tr>{{ post }}</tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
