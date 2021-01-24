@@ -119,11 +119,10 @@ def user(username):
 
 
 # ------------------------------------------ Edit User Profile Page ----------------------------------------------------
-@app.route('/user/<username>/edit_profile', methods=['POST', 'GET'])
+@app.route('/user/edit_profile', methods=['POST', 'GET'])
 @login_required
-def edit_profile(username):
+def edit_profile():
     form = EditProfileForm()
-    # user = User.query.filter_by(username=current_user.username)
     # ------------------------ Loading the Edit Profile Page -----------------------------------------------------------
     if request.method == 'GET':
         form.username.data = current_user.username

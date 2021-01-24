@@ -75,13 +75,25 @@ class EditProfileForm(FlaskForm):
     email = StringField(label='Email',
                         render_kw={'class': 'form-control', 'id': 'form-email'},
                         validators=[Email(),
-                                    length(max=120, message='Too long email')
-                                    ])
+                                    length(max=120, message='Too long email')]
+                        )
 
     about_me = TextAreaField(label='About Me',
                              render_kw={'class': 'form-control', 'id': 'form-about-me'},
-                             validators=[length(min=0, max=140)])
+                             validators=[length(min=0, max=140)]
+                             )
 
     submit = SubmitField(label='Submit',
                          render_kw={'class': 'btn btn-primary', 'id': 'register-button'},
                          )
+
+    # Prevent Duplicate Username
+    def __init__(self, original_username, *args, **kwargs):
+        super(EditProfileForm, self).__init__(*args, **kwargs)
+        self.original_username = original_username
+
+    def validate_username(self, username):
+        if username != self.original_username:
+            user = User.query.filter_by(username=username).first()
+            if user is not None:
+                raise ValidationError('Please try a different username.')
