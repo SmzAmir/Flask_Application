@@ -12,7 +12,9 @@ app = Flask(__name__)
 app.config.from_object(Config)
 db = SQLAlchemy(app)  # database configuration
 migrate = Migrate(app, db)  # migration instance
-login = LoginManager(app)
+login = LoginManager()
+login.__init__(app)
+
 login.login_view = 'login'  # 'login' is the name of the function that handles the user login
 
 if not app.debug:

@@ -58,10 +58,11 @@ def login():
                 next_page = request.args.get('next')  # the next page argument is added to the url after ?next=...
 
                 # ------------------------ Not Valid Next Page or an Attack --------------------------------------------
-                if not next_page or url_parse(next_page).netloc() != '':
+                if not next_page or url_parse(next_page).netloc != '':
                     return redirect(url_for('index'))
 
-                return redirect(url_for(next_page))
+                # return redirect(url_for(next_page))
+                return redirect(url_for('index'))
         # ------------------------ Failed Login ------------------------------------------------------------------------
         else:
             return render_template('login.html', title='Sign In', form=form)
@@ -122,7 +123,7 @@ def user(username):
 @app.route('/user/edit_profile', methods=['POST', 'GET'])
 @login_required
 def edit_profile():
-    form = EditProfileForm()
+    form = EditProfileForm(original_username=current_user)
     # ------------------------ Loading the Edit Profile Page -----------------------------------------------------------
     if request.method == 'GET':
         form.username.data = current_user.username
