@@ -5,6 +5,13 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin  # make any class compatible with flask-login
 
 
+followers = db.Table(
+    'followers',
+    db.Column('follower_id', db.Integer, db.ForeignKey('user.id')),
+    db.Column('followed_id', db.Integer, db.ForeignKey('user.id')),
+)
+
+
 # ------------------------------------------ User Model ----------------------------------------------------------------
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)  # primary key
@@ -17,6 +24,14 @@ class User(UserMixin, db.Model):
                                                                    # lazy='dynamic' makes the "posts" a query rather than a list
     about_me = db.Column(db.String(140))
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
+
+    followed = db.relationship(
+        'User', secondary=followers,
+        primaryjoin=(followers.c.follower_id == id),  # left side
+        secondaryjoin=(followers.c.followed_id == id),  # right side
+        backref=db.backref('followers', lazy='dynamic'),  # right side
+        lazy='dynamic'  # left side
+    )
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
