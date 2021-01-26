@@ -48,6 +48,18 @@ class User(UserMixin, db.Model):
             digest, size
         )
 
+    def follow(self, user):
+        if not self.is_following(user):  # avoid duplicate relationships for the same pair of users
+            self.followed.append(user)
+
+    def unfollow(self, user):
+        if self.is_following(user):  # if only user is following the other user then remove it
+            self.followed.remove(user)
+
+    def is_following(self, user):
+        return self.followed.filter(
+            followers.c.followed_id == user.id).count() > 0
+
 
 # ------------------------------------------ Post Model ----------------------------------------------------------------
 class Post(db.Model):
