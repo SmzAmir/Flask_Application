@@ -18,7 +18,7 @@ class LoginForm(FlaskForm):
                                render_kw={'class': 'form-check-label'})
 
     submit = SubmitField(label='Sign In',
-                         render_kw={'class': 'btn btn-primary', 'id': 'register-button'},
+                         render_kw={'class': 'btn btn-primary', 'id': 'login-submit-button'},
                          )
 
 
@@ -49,7 +49,7 @@ class RegistrationForm(FlaskForm):
                                           ]
                               )
     submit = SubmitField(label='Register',
-                         render_kw={'class': 'btn btn-primary', 'id': 'register-button'},
+                         render_kw={'class': 'btn btn-primary', 'id': 'register-submit-button'},
                          )
 
     def validate_username(self, username):
@@ -84,7 +84,7 @@ class EditProfileForm(FlaskForm):
                              )
 
     submit = SubmitField(label='Submit',
-                         render_kw={'class': 'btn btn-primary', 'id': 'register-button'},
+                         render_kw={'class': 'btn btn-primary', 'id': 'profile-submit-button'},
                          )
 
     # Prevent Duplicate Username
@@ -97,3 +97,15 @@ class EditProfileForm(FlaskForm):
             user = User.query.filter_by(username=username).first()
             if user is not None:
                 raise ValidationError('Please try a different username.')
+
+
+# ------------------------------------------ Post Form -----------------------------------------------------------------
+class PostForm(FlaskForm):
+    body = TextAreaField(label='Say something nice!',
+                         render_kw={'class': 'form-control'},
+                         validators=[DataRequired(), length(min=1, max=140)]
+                         )
+
+    submit = SubmitField(label='Submit',
+                         render_kw={'class': 'btn btn-primary', 'id': 'post-submit-button'},
+                         )

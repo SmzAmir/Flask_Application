@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Do you have something in your mind?</h1>
+<div class="mb-3">
+    <form action="" method="post" class="form">
+        {{ form.hidden_tag() }}
+        <!-- Username Field ------------------------------------------------------------------------------------------->
+        <div class="form-floating mb-3">
+            {{ form.body }}
+            <label>{{ form.body.label }}</label>
+            {% for error in form.body.erros %}
+                <span class="help-block">{{ error }}</span>
+            {% endfor %}
+        </div>
+
+        <!-- Submit Field --------------------------------------------------------------------------------------------->
+        {{ form.submit }}
+    </form>
+</div>
+{% endblock %}
