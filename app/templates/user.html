@@ -11,6 +11,8 @@
 {% if user == current_user %}
     <a href="{{ url_for('edit_profile', username=current_user.username)}}">Edit Your Profile</a>
 {% endif %}
+
+{% if posts %}
 <table class="table">
     <thead>
         <tr>
@@ -27,5 +29,5 @@
         {% endfor %}
     </tbody>
 </table>
-
+{% endif %}
 {% endblock %}

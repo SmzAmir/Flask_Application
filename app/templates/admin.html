@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content%}
+<h1>Hi, {{ user }}!</h1>
+<hr>
+<h2>Users:</h2>
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">User</th>
+            <th scope="col">Email</th>
+            <th scope="col">Options</th>
+            <th scope="col"><button type="submit" class="btn btn-primary"><a style="color:white; text-decoration: none" href="#">Add Post</a></button></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for user in users %}
+        <tr>
+            <th scope="row">{{ loop.index }}</th>
+            <td>{{ user }}</td>
+            <td>{{ user }}</td>
+            <td class="align-middle"><a href="#"><i class="bi bi-pen-fill" style="font-size: 1.1rem; color: cornflowerblue;"></i></a>
+                <i class="bi bi-trash" style="font-size: 1.1rem; color: cornflowerblue;"></i>
+            </td>
+            <td></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock%}

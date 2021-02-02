@@ -151,6 +151,7 @@ def registration():
 @login_required
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
+    print(user)
     posts = [
         {'author': user, 'body': 'Test post #1'},
         {'author': user, 'body': 'Test post #2'}
@@ -178,3 +179,27 @@ def edit_profile():
 
     else:
         return redirect(url_for('user', username=current_user.username))
+
+
+# ------------------------------------------ Admin Dashboard -----------------------------------------------------------
+@app.route('/admin_dashboard', methods=['GET', 'POST'])
+@login_required
+def admin_dashboard():
+    users = User.query.all()
+    # ------------------------ Default Page View -----------------------------------------------------------------------
+    if request.method == 'GET':
+        return render_template('admin.html', title='Admin Panel', users=users)
+    else:
+        pass
+
+
+# ------------------------------------------ Home Page -----------------------------------------------------------------
+@app.route('/admin_dashboard/add_user', methods=['GET', 'POST'])
+@login_required
+def add_user():
+    users = User.query.all()
+    # ------------------------ Default Page View -----------------------------------------------------------------------
+    if request.method == 'GET':
+        return render_template('admin.html', title='Admin Panel', users=users)
+    else:
+        pass
