@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content%}
+<h1>Explore</h1>
+<hr>
+<!-- User Posts ------------------------------------------------------------------------------------------------------->
+<h2>My Posts:</h2>
+<table class="table">
+    <thead>
+    <tr>
+        <th scope="col"># </th>
+        <th scope="col">User</th>
+        <th scope="col">Post</th>
+        <th scope="col">Posted on</th>
+        <th scope="col">Options</th>
+        <th scope="col">
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for post in posts %}
+    <tr>
+        <th scope="row">{{ loop.index }}</th>
+        <td>{{ post.author.username }}</td>
+        <td>{{ post.body }}</td>
+        <td>{{ post.timestamp }}</td>
+        <td class="align-middle">
+            <a href="#"><i class="bi bi-person-circle" style="font-size: 1.1rem; color: cornflowerblue;"></i></a>
+        </td>
+        <td></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<nav aria-label="Page navigation example">
+    <ul class="pagination">
+        {% if prev_url %}
+        <li class="page-item"><a class="page-link" href="{{ prev_url }}">Previous</a></li>
+        {% endif %}
+
+        {% if next_url %}
+        <li class="page-item"><a class="page-link" href="{{ next_url }} ">Next</a></li>
+        {% endif %}
+  </ul>
+</nav>
+{% endblock%}

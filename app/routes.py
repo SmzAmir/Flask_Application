@@ -20,10 +20,41 @@ def before_request():
 @app.route('/index', methods=['GET'])
 @login_required
 def index():
-    posts = Post.query.filter_by(user_id=current_user.id).all()
+    page = request.args.get('page', 1, type=int)
+    user_posts = Post.query.filter_by(user_id=current_user.id).paginate(
+        page, app.config['POSTS_PER_PAGE'], False
+    )
+    next_url = url_for('index', page=user_posts.next_num) if user_posts.has_next else None
+    prev_url = url_for('index', page=user_posts.prev_num) if user_posts.has_prev else None
+
+    followed_posts = current_user.followed_posts()
     # ------------------------ Default Page View -----------------------------------------------------------------------
     if request.method == 'GET':
-        return render_template('index.html', title='Home', user=current_user, posts=posts)
+        return render_template('index.html', title='Home', user=current_user,
+                               user_posts=user_posts.items,
+                               followed_posts=followed_posts,
+                               next_url=next_url,
+                               prev_url=prev_url)
+    else:
+        pass
+
+
+# ------------------------------------------ Explore Page --------------------------------------------------------------
+@app.route('/explore', methods=['GET'])
+@login_required
+def explore():
+    page = request.args.get('page', 1, type=int)
+    posts = Post.query.order_by(Post.timestamp.desc()).paginate(
+        page, app.config['POSTS_PER_PAGE'], False
+    )
+    next_url = url_for('index', page=posts.next_num) if posts.has_next else None
+    prev_url = url_for('index', page=posts.prev_num) if posts.has_prev else None
+    # ------------------------ Default Page View -----------------------------------------------------------------------
+    if request.method == 'GET':
+        return render_template('explore.html', title='Explore',
+                               posts=posts.items,
+                               next_url=next_url,
+                               prev_url=prev_url)
     else:
         pass
 
@@ -43,7 +74,7 @@ def user_post():
             post_obj = Post(body=form.body.data, author=current_user)
             db.session.add(post_obj)
             db.session.commit()
-            flash('You post is not live!')
+            flash('You post is not live!', 'success')
             return redirect(url_for('index'))  # prevent user from submit the form by refreshing the page
         # ------------------------ Failed Posting ----------------------------------------------------------------------
         else:
@@ -66,7 +97,7 @@ def edit_post(post_id):
             new_post = Post(body=form.body.data, id=post_id, timestamp=datetime.utcnow())
             db.session.add(new_post)
             db.session.commit()
-            flash('You post is not live!')
+            flash('You post is changed successfully!')
             return redirect(url_for('index'))  # prevent user from submit the form by refreshing the page
         # ------------------------ Failed Posting ----------------------------------------------------------------------
         else:
@@ -134,7 +165,7 @@ def registration():
         # ------------------------ Successful Registration -------------------------------------------------------------
         if form.validate_on_submit():
             print('Registration form is validated')
-            user = User(username=form.username.data, email=form.email.data)
+            user = User(username=form.username.data.lower(), email=form.email.data.lower())
             user.set_password(password=form.password.data)
             db.session.add(user)
             db.session.commit()
@@ -149,36 +180,42 @@ def registration():
 # ------------------------------------------ User Profile Page ---------------------------------------------------------
 @app.route('/user/<username>', methods=['GET'])
 @login_required
-def user(username):
+def user_profile(username):
     user = User.query.filter_by(username=username).first_or_404()
     print(user)
-    posts = [
-        {'author': user, 'body': 'Test post #1'},
-        {'author': user, 'body': 'Test post #2'}
-    ]
-    return render_template('user.html', user=user, posts=posts)
+    return render_template('user.html', user=user)
 
 
 # ------------------------------------------ Edit User Profile Page ----------------------------------------------------
-@app.route('/user/edit_profile', methods=['POST', 'GET'])
+@app.route('/<username>/edit_profile', methods=['POST', 'GET'])
 @login_required
-def edit_profile():
-    form = EditProfileForm(original_username=current_user)
+def edit_profile(username):
+    user = User.query.filter_by(username=username).first()
+    form = EditProfileForm(obj=user)
     # ------------------------ Loading the Edit Profile Page -----------------------------------------------------------
     if request.method == 'GET':
-        form.username.data = current_user.username
-        form.about_me.data = current_user.about_me
         return render_template('edit_profile.html', form=form)
     # ------------------------ Posting the Edit Profile Form -----------------------------------------------------------
     elif request.method == 'POST':
-        current_user.username = form.username.data
-        current_user.about_me = form.about_me.data
-        db.session.commit()
-        flash('Changes have been accepted!', 'success')
-        return redirect(url_for('user', username=current_user.username))
+        user.username = form.username.data
+        user.email = form.email.data
+        user.about_me = form.about_me.data
+        if form.validate_on_submit():
+            db.session.commit()
+            flash('Changes have been accepted!', 'success')
+            # ------------------------ If User was in a page -------------------------------------------------------
+            next_page = request.args.get('next')  # the next page argument is added to the url after ?next=...
 
+            # ------------------------ Not Valid Next Page or an Attack --------------------------------------------
+            if not next_page or url_parse(next_page).netloc != '':
+                return redirect(url_for('index'))
+
+            return redirect(url_for(next_page))
+        else:
+            flash('Something went wrong!', 'danger')
+            return render_template('edit_profile.html', form=form)
     else:
-        return redirect(url_for('user', username=current_user.username))
+        return redirect(url_for('index'))
 
 
 # ------------------------------------------ Admin Dashboard -----------------------------------------------------------

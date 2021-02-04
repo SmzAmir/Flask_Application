@@ -3,19 +3,21 @@
 {% block content%}
 <h1>Hi, {{ user.username }}!</h1>
 <hr>
+<!-- User Posts ------------------------------------------------------------------------------------------------------->
 <h2>My Posts:</h2>
     <table class="table">
         <thead>
         <tr>
-            <th scope="col">#</th>
-            <th scope="col">Post</th>
-            <th scope="col">Sent on</th>
+            <th scope="col"># </th>
+            <th scope="col">Post <a style="color:white; text-decoration: none" href="{{ url_for('user_post')}}"><i class="bi bi-plus-circle" style="font-size: 1.1rem; color: cornflowerblue;"></i></a></th>
+            <th scope="col">Posted on</th>
             <th scope="col">Options</th>
-            <th scope="col"><button type="submit" class="btn btn-primary"><a style="color:white; text-decoration: none" href="{{ url_for('user_post')}}">Add Post</a></button></th>
+            <th scope="col">
+            </th>
         </tr>
         </thead>
         <tbody>
-        {% for post in posts %}
+        {% for post in user_posts %}
         <tr>
             <th scope="row">{{ loop.index }}</th>
             <td>{{ post.body }}</td>
@@ -28,4 +30,44 @@
         {% endfor %}
         </tbody>
     </table>
+
+<!-- Followed Posts --------------------------------------------------------------------------------------------------->
+<br>
+{% if followed_post %}
+<h2>My Followed Posts:</h2>
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col"># </th>
+            <th scope="col">Post</th>
+            <th scope="col">Posted on</th>
+            <th scope="col">Author</th>
+            <th scope="col">
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for post in followed_posts %}
+        <tr>
+            <th scope="row">{{ loop.index }}</th>
+            <td>{{ post.body }}</td>
+            <td>{{ post.timestamp }}</td>
+            <td>{{ post.author.username }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+<nav aria-label="Page navigation example">
+    <ul class="pagination">
+        {% if prev_url %}
+        <li class="page-item"><a class="page-link" href="{{ prev_url }}">Previous</a></li>
+        {% endif %}
+
+        {% if next_url %}
+        <li class="page-item"><a class="page-link" href="{{ next_url }} ">Next</a></li>
+        {% endif %}
+  </ul>
+</nav>
+
 {% endblock%}

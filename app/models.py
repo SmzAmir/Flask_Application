@@ -22,6 +22,8 @@ class User(UserMixin, db.Model):
     posts = db.relation('Post', backref='author', lazy='dynamic')  # Define relation between User and Post class
                                                                    # backref adds attribute author to the posts
                                                                    # lazy='dynamic' makes the "posts" a query rather than a list
+    roles = db.relation('Role', backref='role', lazy='dynamic')
+
     about_me = db.Column(db.String(140))
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -35,6 +37,9 @@ class User(UserMixin, db.Model):
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
+
+    def user_role(self):
+        return self.roles
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -65,10 +70,17 @@ class User(UserMixin, db.Model):
             followers,  # join Post with followers table
             (followers.c.followed_id == Post.user_id)).filter(
                 followers.c.follower_id == self.id)
-        own = Post.query.filter_by(user_id=self.id)
-        return followed.union(own).order_by(
-                Post.timestamp.desc()
-                )
+        # own = Post.query.filter_by(user_id=self.id)
+        # return followed.union(own).order_by(
+        #         Post.timestamp.desc()
+        #         )
+        return followed
+
+
+class Role(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(4), index=True, unique=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 
 # ------------------------------------------ Post Model ----------------------------------------------------------------

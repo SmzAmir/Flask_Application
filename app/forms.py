@@ -87,10 +87,10 @@ class EditProfileForm(FlaskForm):
                          render_kw={'class': 'btn btn-primary', 'id': 'profile-submit-button'},
                          )
 
-    # Prevent Duplicate Username
-    def __init__(self, original_username, *args, **kwargs):
-        super(EditProfileForm, self).__init__(*args, **kwargs)
-        self.original_username = original_username
+    # # Prevent Duplicate Username
+    # def __init__(self, original_username, *args, **kwargs):
+    #     super(EditProfileForm, self).__init__(*args, **kwargs)
+    #     self.original_username = original_username
 
     def validate_username(self, username):
         if username != self.original_username:
