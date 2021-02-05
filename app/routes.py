@@ -2,9 +2,11 @@ from flask import render_template, flash, redirect, url_for, request
 from datetime import datetime
 from app import app, db
 from werkzeug.urls import url_parse
-from app.forms import LoginForm, RegistrationForm, EditProfileForm, PostForm
+from app.forms import LoginForm, RegistrationForm, EditProfileForm, PostForm, ResetPasswordRequestForm
 from app.models import User, Post
 from flask_login import login_user, current_user, logout_user, login_required
+from app.email import send_password_reset_email
+from flask import session
 
 
 # ------------------------------------------ Last Seen -----------------------------------------------------------------
@@ -175,6 +177,34 @@ def registration():
         else:
             flash('Something went wrong!', 'danger')
             return render_template('registration.html', title='Register', form=form)
+
+
+# ------------------------------------------ Reset Password Page -------------------------------------------------------
+@app.route('/reset_password_request', methods=['GET', 'POST'])
+def reset_password_request():
+    # ------------------------------------------ User Already Logged In ------------------------------------------------
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    else:
+        form = ResetPasswordRequestForm()
+        # ------------------------------------------ Default Render of Page --------------------------------------------
+        if request.method == 'GET':
+            return render_template('reset_password_request.html',
+                                   title='Reset Password', form=form)
+        # ------------------------------------------ Send Reset Request ------------------------------------------------
+        elif request.method == 'POST' and form.validate_on_submit():
+            user = User.query.filter_by(email=form.email.data).first()
+            # If the user exists:
+            if user:
+                send_password_reset_email(user=user)
+                flash('Check your email for the instructions to reset your password', 'success')
+                return redirect(url_for('login'))
+            else:
+                session.clear()
+                flash('Invalid email address', 'danger')
+                return redirect('reset_password_request')
+        else:
+            pass
 
 
 # ------------------------------------------ User Profile Page ---------------------------------------------------------
