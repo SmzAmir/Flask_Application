@@ -111,10 +111,22 @@ class PostForm(FlaskForm):
                          )
 
 
-# ------------------------------------------ Reset Password Form -------------------------------------------------------
+# ------------------------------------------ Reset Password Request Form -----------------------------------------------
 class ResetPasswordRequestForm(FlaskForm):
     email = StringField(label='Email',
                         render_kw={'class': 'form-control'},
                         validators=[DataRequired(), Email()])
+    submit = SubmitField(label='Request Password Reset',
+                         render_kw={'class': 'btn btn-primary', 'id': 'reset-submit-button'})
+
+
+# ------------------------------------------ Reset Password Form -------------------------------------------------------
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField(label='Password',
+                             render_kw={'class': 'form-control', 'id': 'form-password'},
+                             validators=[DataRequired()])
+    password2 = PasswordField(label='Repeat Password',
+                              render_kw={'class': 'form-control', 'id': 'form-password2'},
+                              validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField(label='Request Password Reset',
                          render_kw={'class': 'btn btn-primary', 'id': 'reset-submit-button'})
